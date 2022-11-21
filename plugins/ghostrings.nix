@@ -4,14 +4,14 @@ let
   jdk = jdk11;
 in
 stdenv.mkDerivation rec {
-  pname = "ghidra-cpp-class-analyzer-plugin";
-  version = "2022-11-05";
+  pname = "ghidra-ghostrings-plugin";
+  version = "2022-10-20";
 
   src = fetchFromGitHub {
-    owner = "astrelsky";
-    repo = "Ghidra-Cpp-Class-Analyzer";
-    rev = "8c48817a4b4c6637db80bbc23ac0e83e2bc29a2b";
-    sha256 = "sha256-CwjR9WynYlzQzbI21SrJjZcWVJjkg0HDjB5y5Jm6exI=";
+    owner = "nccgroup";
+    repo = "ghostrings";
+    rev = "34d970a6ea61cc82ba1f4feab365b64b4ed3dee0";
+    sha256 = "sha256-1KzaOK9japniv67WhC4tkOzj/QVjJIG4/TF5TYxB499=";
   };
 
   nativeBuildInputs = [
@@ -36,9 +36,9 @@ stdenv.mkDerivation rec {
   '';
 
   meta = with lib; {
-    description = "C++ Class and Run Time Type Information Analyzer";
-    homepage = "https://github.com/astrelsky/Ghidra-Cpp-Class-Analyzer";
-    license = licenses.mit;
+    description = "Scripts for recovering string definitions in Go binaries with P-Code analysis. Tested with x86, x86-64, ARM, and ARM64.";
+    homepage = "https://github.com/nccgroup/ghostrings";
+    license = licenses.gpl3;
     platforms = platforms.linux;
   };
 }
