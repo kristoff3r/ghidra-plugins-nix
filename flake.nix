@@ -11,29 +11,40 @@
           inherit system;
         };
         lib = pkgs.lib;
+        mkPluginDir = ps: pkgs.symlinkJoin {
+          name = "ghidra-plugins";
+          paths = ps;
+        };
+        plugins = with pkgs; {
+          nes = pkgs.callPackage ./plugins/nes.nix { ghidra = ghidra-bin; };
+          cpp-analyzer = pkgs.callPackage ./plugins/cpp-analyzer.nix { ghidra = ghidra-bin; };
+          golang-analyzer = pkgs.callPackage ./plugins/golang-analyzer.nix { ghidra = ghidra-bin; };
+          ghostrings = pkgs.callPackage ./plugins/ghostrings.nix { ghidra = ghidra-bin; };
+          wasm = pkgs.callPackage ./plugins/wasm.nix {
+            inherit sleigh;
+            ghidra = pkgs.ghidra-bin;
+          };
+        };
+        sleigh = pkgs.callPackage ./sleigh.nix { };
+        ghidra-wrapped = ghidra: f: ghidra.overrideAttrs (attrs: {
+          preFixup = (attrs.preFixup or "") + ''
+            cd $out/lib/ghidra/Ghidra/Extensions
+            for p in ${mkPluginDir (f plugins)}/share/*.zip; do
+              ${pkgs.unzip}/bin/unzip "$p"
+            done
+          '';
+        });
+        toList = (lib.attrsets.mapAttrsToList (_: p: p));
       in
       {
         packages = rec {
-          ghidra = pkgs.callPackage ./ghidra.nix { };
-          sleigh = pkgs.callPackage ./sleigh.nix { };
+          inherit plugins sleigh;
 
-          plugins = {
-            nes = pkgs.callPackage ./plugins/nes.nix { inherit ghidra; };
-            cpp-analyzer = pkgs.callPackage ./plugins/cpp-analyzer.nix { inherit ghidra; };
-            golang-analyzer = pkgs.callPackage ./plugins/golang-analyzer.nix { inherit ghidra; };
-            ghostrings = pkgs.callPackage ./plugins/ghostrings.nix { inherit ghidra; };
-            wasm = pkgs.callPackage ./plugins/wasm.nix { inherit ghidra sleigh; };
-          };
+          ghidra-with-plugins = ghidra-wrapped pkgs.ghidra;
+          ghidra-all-plugins = ghidra-with-plugins toList;
 
-          ghidra-with-plugins = pkgs.callPackage ./ghidra.nix {
-            plugins = with plugins; [
-              nes
-              cpp-analyzer
-              ghostrings
-              golang-analyzer
-              wasm
-            ];
-          };
+          ghidra-bin-with-plugins = ghidra-wrapped pkgs.ghidra-bin;
+          ghidra-bin-all-plugins = ghidra-bin-with-plugins toList;
         };
       }
     );
