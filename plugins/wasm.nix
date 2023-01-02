@@ -12,13 +12,13 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "ghidra-wasm-plugin";
-  version = "2022-04-24";
+  version = "2022-11-24";
 
   src = fetchFromGitHub {
-    owner = "kristoff3r";
+    owner = "nneonneo";
     repo = pname;
-    rev = "8798978d5aebd31edc8cee214a38ffc901808085";
-    sha256 = "sha256-eTVyt8jBFCGtj7EHCAWDBS37t963Q4uGfELnKp7+GeA=";
+    rev = "cd5f7b5b83d2c3236bf5520525b873fa7afdd12c";
+    sha256 = "sha256-1UalKrCLYf8G3L4Svft4r+1aYmtzevZkGgBGgpWI0rM=";
   };
 
   nativeBuildInputs = [

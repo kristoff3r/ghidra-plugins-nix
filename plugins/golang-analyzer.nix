@@ -5,13 +5,13 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "ghidra-golang-analyzer-plugin";
-  version = "2022-10-20";
+  version = "2022-12-20";
 
   src = fetchFromGitHub {
-    owner = "kristoff3r";
+    owner = "mooncat-greenpy";
     repo = "Ghidra_GolangAnalyzerExtension";
-    rev = "d7476b435269ae27573337620f995b0e2d828fff";
-    sha256 = "sha256-1KzaOK9japniv67WhC4tkOzj/QVjJIG4/TF5TYxB498=";
+    rev = "0f90a1192e525692fd82f2a346a2bd72ee193f78";
+    sha256 = "sha256-CDKnTJLkHs5hnpr3ilx6sUNppxtm2wRiEH9oQBydxOg=";
   };
 
   nativeBuildInputs = [
