@@ -16,13 +16,13 @@
           paths = ps;
         };
         plugins = with pkgs; {
-          nes = pkgs.callPackage ./plugins/nes.nix { ghidra = ghidra-bin; };
-          cpp-analyzer = pkgs.callPackage ./plugins/cpp-analyzer.nix { ghidra = ghidra-bin; };
-          golang-analyzer = pkgs.callPackage ./plugins/golang-analyzer.nix { ghidra = ghidra-bin; };
-          ghostrings = pkgs.callPackage ./plugins/ghostrings.nix { ghidra = ghidra-bin; };
-          wasm = pkgs.callPackage ./plugins/wasm.nix {
+          nes = callPackage ./plugins/nes.nix { ghidra = ghidra-bin; };
+          cpp-analyzer = callPackage ./plugins/cpp-analyzer.nix { ghidra = ghidra-bin; };
+          golang-analyzer = callPackage ./plugins/golang-analyzer.nix { ghidra = ghidra-bin; };
+          ghostrings = callPackage ./plugins/ghostrings.nix { ghidra = ghidra-bin; };
+          wasm = callPackage ./plugins/wasm.nix {
             inherit sleigh;
-            ghidra = pkgs.ghidra-bin;
+            ghidra = ghidra-bin;
           };
         };
         sleigh = pkgs.callPackage ./sleigh.nix { };
@@ -34,7 +34,7 @@
             done
           '';
         });
-        toList = (lib.attrsets.mapAttrsToList (_: p: p));
+        toList = lib.attrsets.mapAttrsToList (_: p: p);
       in
       {
         packages = rec {
