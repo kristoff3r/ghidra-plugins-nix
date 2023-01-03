@@ -45,6 +45,8 @@
 
           ghidra-bin-with-plugins = ghidra-wrapped pkgs.ghidra-bin;
           ghidra-bin-all-plugins = ghidra-bin-with-plugins toList;
+
+          default = ghidra-bin-all-plugins;
         };
       }
     );
