@@ -42,6 +42,7 @@
 
           ghidra-with-plugins = ghidra-wrapped pkgs.ghidra;
           ghidra-all-plugins = ghidra-with-plugins toList;
+          ghidra-head = pkgs.callPackage ./ghidra-head.nix { };
 
           ghidra-bin-with-plugins = ghidra-wrapped pkgs.ghidra-bin;
           ghidra-bin-all-plugins = ghidra-bin-with-plugins toList;
