@@ -11,7 +11,7 @@ stdenv.mkDerivation rec {
     owner = "nccgroup";
     repo = "ghostrings";
     rev = "34d970a6ea61cc82ba1f4feab365b64b4ed3dee0";
-    sha256 = "sha256-1KzaOK9japniv67WhC4tkOzj/QVjJIG4/TF5TYxB499=";
+    sha256 = "sha256-gfYLQkBbEvhjEaXYZFhlB7ieaFEOBtYOsxpL3PL36Fk=";
   };
 
   nativeBuildInputs = [
