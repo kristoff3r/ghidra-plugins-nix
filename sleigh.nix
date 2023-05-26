@@ -6,11 +6,11 @@
 
 stdenv.mkDerivation rec {
   pname = "sleigh";
-  version = "10.2.2";
+  version = "10.2.3";
 
   src = fetchzip {
     url = "https://github.com/lifting-bits/sleigh/releases/download/v${version}/Linux-sleigh-${version}-1.x86_64.tar.gz";
-    sha256 = "sha256-SqPjewlJBIzDCBj2xQPrP+xATdwLhVT9ccfY3E9tLlU=";
+    sha256 = "sha256-fWWPs/Gx4+P/yWOtV7JXkRqhhZ5qs7kYDzcc3/CJlk8=";
   };
 
   nativeBuildInputs = [

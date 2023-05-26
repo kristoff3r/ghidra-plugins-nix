@@ -15,12 +15,13 @@
           name = "ghidra-plugins";
           paths = ps;
         };
-        plugins = with pkgs; {
-          nes = callPackage ./plugins/nes.nix { ghidra = ghidra-bin; };
-          cpp-analyzer = callPackage ./plugins/cpp-analyzer.nix { ghidra = ghidra-bin; };
-          golang-analyzer = callPackage ./plugins/golang-analyzer.nix { ghidra = ghidra-bin; };
-          ghostrings = callPackage ./plugins/ghostrings.nix { ghidra = ghidra-bin; };
-          wasm = callPackage ./plugins/wasm.nix {
+        plugins = {
+          # TODO: commented out plugins are broken in Ghidra 10.3
+          # nes = pkgs.callPackage ./plugins/nes.nix { ghidra = ghidra-bin; };
+          # cpp-analyzer = pkgs.callPackage ./plugins/cpp-analyzer.nix { ghidra = ghidra-bin; };
+          # golang-analyzer = pkgs.callPackage ./plugins/golang-analyzer.nix { ghidra = ghidra-bin; };
+          # ghostrings = pkgs.callPackage ./plugins/ghostrings.nix { ghidra = ghidra-bin; };
+          wasm = pkgs.callPackage ./plugins/wasm.nix {
             inherit sleigh;
             ghidra = ghidra-bin;
           };
@@ -35,16 +36,18 @@
           '';
         });
         toList = lib.attrsets.mapAttrsToList (_: p: p);
+
+        ghidra = pkgs.callPackage ./ghidra/build.nix { };
+        ghidra-bin = pkgs.callPackage ./ghidra { };
       in
       {
         packages = rec {
-          inherit plugins sleigh;
+          inherit plugins sleigh ghidra ghidra-bin;
 
-          ghidra-with-plugins = ghidra-wrapped pkgs.ghidra;
+          ghidra-with-plugins = ghidra-wrapped ghidra;
           ghidra-all-plugins = ghidra-with-plugins toList;
-          ghidra-head = pkgs.callPackage ./ghidra-head.nix { };
 
-          ghidra-bin-with-plugins = ghidra-wrapped pkgs.ghidra-bin;
+          ghidra-bin-with-plugins = ghidra-wrapped ghidra-bin;
           ghidra-bin-all-plugins = ghidra-bin-with-plugins toList;
 
           default = ghidra-bin-all-plugins;

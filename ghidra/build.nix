@@ -3,7 +3,7 @@
 , fetchurl
 , fetchFromGitHub
 , lib
-, gradle
+, gradle_7
 , perl
 , makeWrapper
 , openjdk17
@@ -12,22 +12,23 @@
 , autoPatchelfHook
 , icoutils
 , xcbuild
-, protobuf3_21
+, protobuf
 , libredirect
 }:
 
 let
   pkg_path = "$out/lib/ghidra";
   pname = "ghidra";
-  version = "a8cdc43bd4c885f5714f6267e6a4b29f05572bf9";
-  protobuf = protobuf3_21;
+  version = "10.3";
 
   src = fetchFromGitHub {
     owner = "NationalSecurityAgency";
     repo = "Ghidra";
-    rev = version;
-    sha256 = "sha256-CJeUtsoG9W6r6Gs/ND5xH+Wq4bID1Y7xJs0J8e+rmOY=";
+    rev = "Ghidra_${version}_build";
+    hash = "sha256-v3XP+4fwjPzt/OOxX27L0twXw8T1Y94hgP4A5Ukol5I=";
   };
+
+  gradle = gradle_7;
 
   desktopItem = makeDesktopItem {
     name = "ghidra";
@@ -41,47 +42,51 @@ let
   # postPatch scripts.
   # Tells ghidra to use our own protoc binary instead of the prebuilt one.
   fixProtoc = ''
-        cat >>Ghidra/Debug/Debugger-gadp/build.gradle <<HERE
-    protobuf {
-      protoc {
-        path = '${protobuf}/bin/protoc'
-      }
-    }
-    HERE
+    cat >>Ghidra/Debug/Debugger-gadp/build.gradle <<HERE
+protobuf {
+  protoc {
+    path = '${protobuf}/bin/protoc'
+  }
+}
+HERE
+    cat >>Ghidra/Debug/Debugger-isf/build.gradle <<HERE
+protobuf {
+  protoc {
+    path = '${protobuf}/bin/protoc'
+  }
+}
+HERE
   '';
 
   # Adds a gradle step that downloads all the dependencies to the gradle cache.
   addResolveStep = ''
-        cat >>build.gradle <<HERE
-    task resolveDependencies {
-      doLast {
-        logger.info("TEST")
-        project.rootProject.allprojects.each { subProject ->
-          subProject.buildscript.configurations.each { configuration ->
-            resolveConfiguration(subProject, configuration, "buildscript config \''${configuration.name}")
-          }
-          subProject.configurations.each { configuration ->
-            resolveConfiguration(subProject, configuration, "config \''${configuration.name}")
-          }
-        }
+    cat >>build.gradle <<HERE
+task resolveDependencies {
+  doLast {
+    project.rootProject.allprojects.each { subProject ->
+      subProject.buildscript.configurations.each { configuration ->
+        resolveConfiguration(subProject, configuration, "buildscript config \''${configuration.name}")
+      }
+      subProject.configurations.each { configuration ->
+        resolveConfiguration(subProject, configuration, "config \''${configuration.name}")
       }
     }
-    void resolveConfiguration(subProject, configuration, name) {
-      if (configuration.canBeResolved) {
-        logger.info("Resolving project {} {}", subProject.name, name)
-        configuration.resolve()
-      } else {
-        logger.info("Cannot resolve project {} {}", subProject.name, name)
-      }
-    }
-    HERE
+  }
+}
+void resolveConfiguration(subProject, configuration, name) {
+  if (configuration.canBeResolved) {
+    logger.info("Resolving project {} {}", subProject.name, name)
+    configuration.resolve()
+  }
+}
+HERE
   '';
 
   # fake build to pre-download deps into fixed-output derivation
   # Taken from mindustry derivation.
   deps = stdenv.mkDerivation {
     pname = "${pname}-deps";
-    inherit src version;
+    inherit version src;
 
     patches = [ ./0001-Use-protobuf-gradle-plugin.patch ];
     postPatch = fixProtoc + addResolveStep;
@@ -91,7 +96,7 @@ let
       export HOME="$NIX_BUILD_TOP/home"
       mkdir -p "$HOME"
       export JAVA_TOOL_OPTIONS="-Duser.home='$HOME'"
-      export GRADLE_USER_HOME="$HOME/.gradle" #
+      export GRADLE_USER_HOME="$HOME/.gradle"
 
       # First, fetch the static dependencies.
       gradle --no-daemon --info -Dorg.gradle.java.home=${openjdk17} -I gradle/support/fetchDependencies.gradle init
@@ -108,18 +113,14 @@ let
     '';
     outputHashAlgo = "sha256";
     outputHashMode = "recursive";
-    outputHash = "sha256-T64/5eVWAWBczmWBpLoGx3lK1/pZEV69fmHAmzvNTI4=";
+    outputHash = "sha256-HveS3f8XHpJqefc4djYmnYfd01H2OBFK5PLNOsHAqlc=";
   };
 
-in
-stdenv.mkDerivation rec {
+in stdenv.mkDerivation rec {
   inherit pname version src;
 
   nativeBuildInputs = [
-    gradle
-    unzip
-    makeWrapper
-    icoutils
+    gradle unzip makeWrapper icoutils
   ] ++ lib.optional stdenv.isDarwin xcbuild;
 
   dontStrip = true;
@@ -173,8 +174,11 @@ stdenv.mkDerivation rec {
     platforms = [ "x86_64-linux" "x86_64-darwin" "aarch64-darwin" ];
     sourceProvenance = with sourceTypes; [
       fromSource
-      binaryBytecode # deps
+      binaryBytecode  # deps
     ];
     license = licenses.asl20;
+    maintainers = with maintainers; [ roblabla ];
+    broken = stdenv.isDarwin;
   };
+
 }
