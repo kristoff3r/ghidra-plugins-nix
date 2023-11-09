@@ -1,4 +1,4 @@
-{ buildPythonPackage, fetchPypi, substituteAll, pip, jfx-bridge }:
+{ buildPythonPackage, fetchPypi, substituteAll, pip, jfx-bridge, setuptools }:
 
 buildPythonPackage rec {
   pname = "ghidra_bridge";
@@ -16,6 +16,7 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [
     jfx-bridge
+    setuptools
   ];
 
   patches = [
