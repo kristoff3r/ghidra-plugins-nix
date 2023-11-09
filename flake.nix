@@ -53,6 +53,12 @@
           default = ghidra-bin-all-plugins;
 
           ghidra-stubs = pkgs.callPackage ./packages/ghidra-stubs.nix { inherit (pkgs.python3Packages) buildPythonPackage; };
+
+          jfx-bridge = pkgs.callPackage ./packages/jfx-bridge.nix { inherit (pkgs.python3Packages) buildPythonPackage pip; };
+          ghidra-bridge = pkgs.callPackage ./packages/ghidra-bridge.nix {
+            inherit (pkgs.python3Packages) buildPythonPackage pip;
+            inherit jfx-bridge;
+          };
         };
       }
     );
