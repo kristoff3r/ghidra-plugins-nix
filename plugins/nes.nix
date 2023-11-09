@@ -3,15 +3,15 @@
 let
   jdk = jdk11;
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation {
   pname = "ghidra-nes-plugin";
-  version = "2022-10-08";
+  version = "2023-05-27";
 
   src = fetchFromGitHub {
     owner = "kylewlacy";
     repo = "GhidraNes";
-    rev = "136cbb7faa1e75ec42a1b1471100c1c2554eb14a";
-    sha256 = "sha256-YeXs+m/gZIV69HqhULO8rUHEX+U7giBJTVlguTRWLBk=";
+    rev = "ef27b8dd40ca61e43f7f97542690761bb7cf2c2c";
+    sha256 = "sha256-AfJcBZfxIfcFLZFD1X9EHOEEJxW8LPmiKJnd8Y50WaE=";
   };
 
   nativeBuildInputs = [

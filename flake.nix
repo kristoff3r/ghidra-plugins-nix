@@ -16,15 +16,15 @@
           paths = ps;
         };
         plugins = {
-          # TODO: commented out plugins are broken in Ghidra 10.3
-          # nes = pkgs.callPackage ./plugins/nes.nix { ghidra = ghidra-bin; };
-          # cpp-analyzer = pkgs.callPackage ./plugins/cpp-analyzer.nix { ghidra = ghidra-bin; };
-          # golang-analyzer = pkgs.callPackage ./plugins/golang-analyzer.nix { ghidra = ghidra-bin; };
-          # ghostrings = pkgs.callPackage ./plugins/ghostrings.nix { ghidra = ghidra-bin; };
+          nes = pkgs.callPackage ./plugins/nes.nix { ghidra = ghidra-bin; };
           wasm = pkgs.callPackage ./plugins/wasm.nix {
             inherit sleigh;
             ghidra = ghidra-bin;
           };
+          # TODO: commented out plugins are broken in Ghidra 10.3
+          # cpp-analyzer = pkgs.callPackage ./plugins/cpp-analyzer.nix { ghidra = ghidra-bin; };
+          # golang-analyzer = pkgs.callPackage ./plugins/golang-analyzer.nix { ghidra = ghidra-bin; };
+          # ghostrings = pkgs.callPackage ./plugins/ghostrings.nix { ghidra = ghidra-bin; };
         };
         sleigh = pkgs.callPackage ./sleigh.nix { };
         ghidra-wrapped = ghidra: f: ghidra.overrideAttrs (attrs: {
@@ -51,6 +51,8 @@
           ghidra-bin-all-plugins = ghidra-bin-with-plugins toList;
 
           default = ghidra-bin-all-plugins;
+
+          ghidra-stubs = pkgs.callPackage ./packages/ghidra-stubs.nix { inherit (pkgs.python3Packages) buildPythonPackage; };
         };
       }
     );

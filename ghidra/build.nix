@@ -1,6 +1,4 @@
 { stdenv
-, fetchzip
-, fetchurl
 , fetchFromGitHub
 , lib
 , gradle_7
@@ -9,23 +7,21 @@
 , openjdk17
 , unzip
 , makeDesktopItem
-, autoPatchelfHook
 , icoutils
 , xcbuild
 , protobuf
-, libredirect
 }:
 
 let
   pkg_path = "$out/lib/ghidra";
   pname = "ghidra";
-  version = "10.3";
+  version = "10.4";
 
   src = fetchFromGitHub {
     owner = "NationalSecurityAgency";
     repo = "Ghidra";
     rev = "Ghidra_${version}_build";
-    hash = "sha256-v3XP+4fwjPzt/OOxX27L0twXw8T1Y94hgP4A5Ukol5I=";
+    hash = "sha256-g0JM6pm1vkCh9yBB5mfrOiNrImqoyWdQcEe2g+AO6LQ=";
   };
 
   gradle = gradle_7;
@@ -40,24 +36,6 @@ let
   };
 
   # postPatch scripts.
-  # Tells ghidra to use our own protoc binary instead of the prebuilt one.
-  fixProtoc = ''
-    cat >>Ghidra/Debug/Debugger-gadp/build.gradle <<HERE
-protobuf {
-  protoc {
-    path = '${protobuf}/bin/protoc'
-  }
-}
-HERE
-    cat >>Ghidra/Debug/Debugger-isf/build.gradle <<HERE
-protobuf {
-  protoc {
-    path = '${protobuf}/bin/protoc'
-  }
-}
-HERE
-  '';
-
   # Adds a gradle step that downloads all the dependencies to the gradle cache.
   addResolveStep = ''
     cat >>build.gradle <<HERE
@@ -89,7 +67,7 @@ HERE
     inherit version src;
 
     patches = [ ./0001-Use-protobuf-gradle-plugin.patch ];
-    postPatch = fixProtoc + addResolveStep;
+    postPatch = addResolveStep;
 
     nativeBuildInputs = [ gradle perl ] ++ lib.optional stdenv.isDarwin xcbuild;
     buildPhase = ''
@@ -116,17 +94,16 @@ HERE
     outputHash = "sha256-HveS3f8XHpJqefc4djYmnYfd01H2OBFK5PLNOsHAqlc=";
   };
 
-in stdenv.mkDerivation rec {
+in stdenv.mkDerivation {
   inherit pname version src;
 
   nativeBuildInputs = [
-    gradle unzip makeWrapper icoutils
+    gradle unzip makeWrapper icoutils protobuf
   ] ++ lib.optional stdenv.isDarwin xcbuild;
 
   dontStrip = true;
 
   patches = [ ./0001-Use-protobuf-gradle-plugin.patch ];
-  postPatch = fixProtoc;
 
   buildPhase = ''
     export HOME="$NIX_BUILD_TOP/home"
@@ -171,14 +148,13 @@ in stdenv.mkDerivation rec {
   meta = with lib; {
     description = "A software reverse engineering (SRE) suite of tools developed by NSA's Research Directorate in support of the Cybersecurity mission";
     homepage = "https://ghidra-sre.org/";
-    platforms = [ "x86_64-linux" "x86_64-darwin" "aarch64-darwin" ];
+    platforms = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
     sourceProvenance = with sourceTypes; [
       fromSource
       binaryBytecode  # deps
     ];
     license = licenses.asl20;
     maintainers = with maintainers; [ roblabla ];
-    broken = stdenv.isDarwin;
+    broken = stdenv.isDarwin && stdenv.isx86_64;
   };
-
 }
