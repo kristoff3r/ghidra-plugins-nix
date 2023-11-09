@@ -10,6 +10,7 @@
 , icoutils
 , xcbuild
 , protobuf
+, fetchurl
 }:
 
 let
@@ -103,7 +104,14 @@ in stdenv.mkDerivation {
 
   dontStrip = true;
 
-  patches = [ ./0001-Use-protobuf-gradle-plugin.patch ];
+  patches = [
+    ./0001-Use-protobuf-gradle-plugin.patch
+    (fetchurl {
+      name = "0002-remove-executable-bit.patch";
+      url = "https://github.com/NationalSecurityAgency/ghidra/commit/e2a945624b74e5d42dc85e9c1f992315dd154db1.patch";
+      sha256 = "sha256-DUePl8sZOhouivkrOkRzg4pmnglTxE9FVOxozvfhfPc=";
+    })
+  ];
 
   buildPhase = ''
     export HOME="$NIX_BUILD_TOP/home"
@@ -157,4 +165,5 @@ in stdenv.mkDerivation {
     maintainers = with maintainers; [ roblabla ];
     broken = stdenv.isDarwin && stdenv.isx86_64;
   };
+
 }

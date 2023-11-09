@@ -21,7 +21,7 @@ buildPythonPackage rec {
 
   patches = [
       (substituteAll {
-      src = ./ghidra-bridge-setuptools.patch;
+      src = ./patches/ghidra-bridge-setuptools.patch;
       inherit version;
     })
   ];

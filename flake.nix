@@ -5,7 +5,7 @@
   };
 
   outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
+    flake-utils.lib.eachSystem [ "x86_64-linux" ] (system:
       let
         pkgs = import nixpkgs {
           inherit system;
@@ -21,12 +21,12 @@
             inherit sleigh;
             ghidra = ghidra-bin;
           };
-          # TODO: commented out plugins are broken in Ghidra 10.3
+          # TODO: commented out plugins are broken in Ghidra 10.3+
           # cpp-analyzer = pkgs.callPackage ./plugins/cpp-analyzer.nix { ghidra = ghidra-bin; };
           # golang-analyzer = pkgs.callPackage ./plugins/golang-analyzer.nix { ghidra = ghidra-bin; };
           # ghostrings = pkgs.callPackage ./plugins/ghostrings.nix { ghidra = ghidra-bin; };
         };
-        sleigh = pkgs.callPackage ./sleigh.nix { };
+        sleigh = pkgs.callPackage ./packages/sleigh.nix { };
         ghidra-wrapped = ghidra: f: ghidra.overrideAttrs (attrs: {
           preFixup = (attrs.preFixup or "") + ''
             cd $out/lib/ghidra/Ghidra/Extensions
@@ -50,8 +50,8 @@
           inherit jfx-bridge;
         };
       in
-      {
-        packages = rec {
+      rec {
+        packages = flake-utils.lib.flattenTree rec {
           # Ghidra versions
           default = ghidra-bin-all-plugins;
           inherit plugins sleigh ghidra ghidra-bin;
@@ -63,6 +63,10 @@
 
           # Python packages
           inherit ghidra-stubs ghidra-bridge jfx-bridge;
+        };
+
+        checks = {
+          inherit (packages) ghidra-all-plugins ghidra-bin-all-plugins ghidra-stubs ghidra-bridge;
         };
       }
     );
