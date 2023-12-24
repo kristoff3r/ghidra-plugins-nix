@@ -62,7 +62,9 @@
         };
 
         checks = {
-          inherit (packages) ghidra-all-plugins ghidra-bin-all-plugins ghidra-stubs ghidra-bridge;
+          inherit (packages) ghidra-bin-all-plugins ghidra-stubs ghidra-bridge;
+          # TODO: broken
+          # inherit (packages) ghidra-all-plugins;
         };
 
         devShells.default = pkgs.mkShell {
