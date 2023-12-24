@@ -17,10 +17,10 @@
         };
         plugins = {
           nes = pkgs.callPackage ./plugins/nes.nix { ghidra = ghidra-bin; };
-          # wasm = pkgs.callPackage ./plugins/wasm.nix {
-          #   inherit sleigh;
-          #   ghidra = ghidra-bin;
-          # };
+          wasm = pkgs.callPackage ./plugins/wasm.nix {
+            inherit sleigh;
+            ghidra = ghidra-bin;
+          };
         };
         sleigh = pkgs.callPackage ./packages/sleigh.nix { };
         ghidra-wrapped = ghidra: f: ghidra.overrideAttrs (attrs: {
@@ -63,6 +63,16 @@
 
         checks = {
           inherit (packages) ghidra-all-plugins ghidra-bin-all-plugins ghidra-stubs ghidra-bridge;
+        };
+
+        devShells.default = pkgs.mkShell {
+          buildInputs = [
+            pkgs.jdk
+            pkgs.gradle
+            ghidra-bin
+          ];
+
+          GHIDRA_INSTALL_DIR="${ghidra-bin}/lib/ghidra";
         };
       }
     );
