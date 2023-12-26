@@ -17,8 +17,8 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "kristoff3r";
     repo = pname;
-    rev = "2fbb3cd4af0f85ade324016d11eea6129134db52";
-    sha256 = "sha256-4yzKclQ768UMRG5J0W21t8ZynBJbgUbNMBSdveBMsgg=";
+    rev = "78186a87c05069fcb9f1257adb518121896c3ce8";
+    sha256 = "sha256-y36MpiPNVLOFPMmHuBqoivRs6c7oyPMpWNETvy4p/W4=";
   };
 
   nativeBuildInputs = [
