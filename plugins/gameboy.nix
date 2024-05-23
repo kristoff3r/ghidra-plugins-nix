@@ -5,27 +5,33 @@
   ghidra,
   jdk,
   gradle,
+  kotlin,
   nix-update-script,
 }:
 
-stdenv.mkDerivation {
-  pname = "ghidra-nes-plugin";
-  version = "20240311-unstable-2024-03-11";
+stdenv.mkDerivation rec {
+  pname = "ghidra-gameboy-plugin";
+  version = "20250309-unstable-2025-03-09";
 
   src = fetchFromGitHub {
-    owner = "kylewlacy";
-    repo = "GhidraNes";
-    rev = "00d4fc58d230f120afb96a8454eca2c82c4ef2b5";
-    sha256 = "sha256-P9SyQO0GI6VAutplxKvQhUWGylMRfASrBrXCxWlZGiA=";
+    owner = "Gekkio";
+    repo = "GhidraBoy";
+    rev = "d899c2a6a364cce46fae664328a73db277c7a3fb";
+    sha256 = "sha256-+GiimSg/T66NznJy5XcJheSvXExBpYswkqtXCt2hggE=";
   };
 
   nativeBuildInputs = [
     jdk
     gradle
+    kotlin
   ];
 
   buildPhase = ''
-    cd GhidraNes
+    # The plugin directory is named by the folder where it gets built -_-
+    mkdir ${pname}
+    mv * ${pname} || true
+    cd ${pname}
+
     GHIDRA_INSTALL_DIR=${ghidra}/lib/ghidra gradle buildExtension --no-daemon
   '';
 
@@ -39,8 +45,8 @@ stdenv.mkDerivation {
   passthru.updateScript = nix-update-script { };
 
   meta = with lib; {
-    description = "A Ghidra extension to support disassembling and analyzing NES ROMs";
-    homepage = "https://github.com/kylewlacy/GhidraNes";
+    description = "Gameboy plugin for Ghidra";
+    homepage = "https://github.com/Gekkio/GhidraBoy";
     license = licenses.gpl3;
     platforms = platforms.linux;
   };

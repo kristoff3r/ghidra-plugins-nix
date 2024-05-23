@@ -1,24 +1,23 @@
-{ stdenv
-, lib
-, fetchFromGitHub
-, ghidra
-, jdk11
-, gradle
-, sleigh
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
+  ghidra,
+  jdk,
+  gradle,
+  sleigh,
+  nix-update-script,
 }:
 
-let
-  jdk = jdk11;
-in
 stdenv.mkDerivation rec {
   pname = "ghidra-wasm-plugin";
-  version = "2023-12-24";
+  version = "2.3.1-unstable-2025-01-22";
 
   src = fetchFromGitHub {
-    owner = "kristoff3r";
+    owner = "nneonneo";
     repo = pname;
-    rev = "78186a87c05069fcb9f1257adb518121896c3ce8";
-    sha256 = "sha256-y36MpiPNVLOFPMmHuBqoivRs6c7oyPMpWNETvy4p/W4=";
+    rev = "93532ad5d3033b62236e453be437b7435a0a6d8b";
+    sha256 = "sha256-JFUPhh4WUcfxYow3kLMyva1Ni/cQBIit983o/KbbKps=";
   };
 
   nativeBuildInputs = [
@@ -45,6 +44,8 @@ stdenv.mkDerivation rec {
 
     runHook postInstall
   '';
+
+  passthru.updateScript = nix-update-script { };
 
   meta = with lib; {
     description = "Module to load WebAssembly files into Ghidra";

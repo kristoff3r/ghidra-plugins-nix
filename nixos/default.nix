@@ -1,22 +1,27 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 let
-    cfg = config.services.ghidra;
-    stateDir = "/var/lib/ghidra";
+  cfg = config.services.ghidra;
+  stateDir = "/var/lib/ghidra";
 in
 {
   options.services.ghidra = {
-   enable = lib.mkEnableOption "Host a Ghidra server";
+    enable = lib.mkEnableOption "Host a Ghidra server";
 
-   hostname = lib.mkOption {
-     type = lib.types.str;
-     description = "Which hostname is used for the server";
-   };
+    hostname = lib.mkOption {
+      type = lib.types.str;
+      description = "Which hostname is used for the server";
+    };
 
-   package = lib.mkOption {
-    type = lib.types.package;
-    default = pkgs.ghidra-bin;
-   };
+    package = lib.mkOption {
+      type = lib.types.package;
+      default = pkgs.ghidra-bin;
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -35,11 +40,12 @@ in
           mkdir ${stateDir}/server
           ln -s ${cfg.package}/lib/ghidra/server/ghidraSvr ${stateDir}/server
         '';
-        ExecStart = ''${stateDir}/server/ghidraSvr console'';
+        # ExecStart = ''${stateDir}/server/ghidraSvr console'';
+        ExecStart = ''${cfg.package}/lib/ghidra/Ghidra/Features/GhidraServer/data/yajsw-stable-13.09/wrapper.jar -c'';
         StateDirectory = "ghidra";
         WorkingDirectory = "${stateDir}";
         StateDirectoryMode = "0700";
-        Environment=[
+        Environment = [
           "JAVA_HOME='${pkgs.jdk}'"
         ];
       };

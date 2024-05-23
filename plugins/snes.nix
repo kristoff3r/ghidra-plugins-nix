@@ -9,14 +9,14 @@
 }:
 
 stdenv.mkDerivation {
-  pname = "ghidra-nes-plugin";
-  version = "20240311-unstable-2024-03-11";
+  pname = "ghidra-snes-loader";
+  version = "0-unstable-2023-07-13";
 
   src = fetchFromGitHub {
-    owner = "kylewlacy";
-    repo = "GhidraNes";
-    rev = "00d4fc58d230f120afb96a8454eca2c82c4ef2b5";
-    sha256 = "sha256-P9SyQO0GI6VAutplxKvQhUWGylMRfASrBrXCxWlZGiA=";
+    owner = "CelestialAmber";
+    repo = "ghidra-snes-loader";
+    rev = "69fbe4bf43ed1469652a4c5129d6f874268a41d6";
+    sha256 = "sha256-/fWb/vVwm0vowaKffRtsdbCYR+wzWiY4HcUYiW6xI/s=";
   };
 
   nativeBuildInputs = [
@@ -25,7 +25,7 @@ stdenv.mkDerivation {
   ];
 
   buildPhase = ''
-    cd GhidraNes
+    cd SnesLoader
     GHIDRA_INSTALL_DIR=${ghidra}/lib/ghidra gradle buildExtension --no-daemon
   '';
 
@@ -39,8 +39,8 @@ stdenv.mkDerivation {
   passthru.updateScript = nix-update-script { };
 
   meta = with lib; {
-    description = "A Ghidra extension to support disassembling and analyzing NES ROMs";
-    homepage = "https://github.com/kylewlacy/GhidraNes";
+    description = "Loader for SNES ROMs";
+    homepage = "https://github.com/achan1989/ghidra-snes-loader";
     license = licenses.gpl3;
     platforms = platforms.linux;
   };
