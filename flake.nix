@@ -11,10 +11,7 @@
           inherit system;
         };
         lib = pkgs.lib;
-        mkPluginDir = ps: pkgs.symlinkJoin {
-          name = "ghidra-plugins";
-          paths = ps;
-        };
+
         plugins = {
           nes = pkgs.callPackage ./plugins/nes.nix { ghidra = ghidra-bin; };
           wasm = pkgs.callPackage ./plugins/wasm.nix {
@@ -22,19 +19,31 @@
             ghidra = ghidra-bin;
           };
         };
+
         sleigh = pkgs.callPackage ./packages/sleigh.nix { };
-        ghidra-wrapped = ghidra: f: ghidra.overrideAttrs (attrs: {
+        ghidra-wrapped = ghidra: { plugins, processors}: ghidra.overrideAttrs (attrs:
+          let
+            pluginDir = pkgs.symlinkJoin { name = "ghidra-plugins"; paths = plugins; };
+            processorsDir = pkgs.symlinkJoin { name = "ghidra-processors"; paths = processors; };
+          in
+        {
           preFixup = (attrs.preFixup or "") + ''
-            cd $out/lib/ghidra/Ghidra/Extensions
-            for p in ${mkPluginDir (f plugins)}/share/*.zip; do
-              ${pkgs.unzip}/bin/unzip "$p"
-            done
+            pushd $out/lib/ghidra/Ghidra/Extensions
+              for p in ${pluginDir}/share/*.zip; do
+                ${pkgs.unzip}/bin/unzip "$p"
+              done
+            popd
+
+            pushd $out/lib/ghidra/Ghidra/Processors
+              for p in ${processorsDir}/share/*; do
+                cp -r $p .
+              done
+            popd
 
             ${pkgs.python3.withPackages(ps: [ghidra-bridge])}/bin/python3 -m ghidra_bridge.install_server \
               $out/lib/ghidra/Ghidra/Features/Python/ghidra_scripts
           '';
         });
-        toList = lib.attrsets.mapAttrsToList (_: p: p);
 
         ghidra = pkgs.callPackage ./ghidra/build.nix { };
         ghidra-bin = pkgs.callPackage ./ghidra { };
@@ -53,9 +62,9 @@
           inherit plugins sleigh ghidra ghidra-bin;
 
           ghidra-with-plugins = ghidra-wrapped ghidra;
-          ghidra-all-plugins = ghidra-with-plugins toList;
+          ghidra-all-plugins = ghidra-with-plugins { inherit plugins; processors = []; };
           ghidra-bin-with-plugins = ghidra-wrapped ghidra-bin;
-          ghidra-bin-all-plugins = ghidra-bin-with-plugins toList;
+          ghidra-bin-all-plugins = ghidra-bin-with-plugins { inherit plugins; processors = []; };
 
           # Python packages
           inherit ghidra-stubs ghidra-bridge jfx-bridge;
@@ -72,6 +81,7 @@
             pkgs.jdk
             pkgs.gradle
             ghidra-bin
+            ghidra-bridge
           ];
 
           GHIDRA_INSTALL_DIR="${ghidra-bin}/lib/ghidra";
