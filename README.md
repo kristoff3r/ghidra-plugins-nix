@@ -1,3 +1,5 @@
+# Deprecated as ghidra-extensions is now in upstream nixpkgs
+
 # ghidra-plugins-nix
 
 Nix derivations for building and configuring Ghidra and Ghidra plugins.
