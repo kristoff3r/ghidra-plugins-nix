@@ -12,7 +12,7 @@ First get Nix with [flakes enabled](https://nixos.wiki/wiki/Flakes#Enable_flakes
 then you can start a Ghidra with all current plugins using the following command:
 
 ```bash
-nix shell "github:kristoff3r/ghidra-plugins-nix" -c ghidra
+nix run "github:kristoff3r/ghidra-plugins-nix"
 ```
 You can also add it with only the plugins you need to a NixOS configuration or a custom flake enviroment, for example:
 

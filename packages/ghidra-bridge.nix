@@ -1,4 +1,11 @@
-{ buildPythonPackage, fetchPypi, substituteAll, pip, jfx-bridge, setuptools }:
+{
+  buildPythonPackage,
+  fetchPypi,
+  substituteAll,
+  pip,
+  jfx-bridge,
+  setuptools,
+}:
 
 buildPythonPackage rec {
   pname = "ghidra_bridge";
@@ -20,7 +27,7 @@ buildPythonPackage rec {
   ];
 
   patches = [
-      (substituteAll {
+    (substituteAll {
       src = ./patches/ghidra-bridge-setuptools.patch;
       inherit version;
     })

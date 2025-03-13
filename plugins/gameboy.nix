@@ -5,23 +5,24 @@
   ghidra,
   jdk,
   gradle,
-  sleigh,
+  kotlin,
 }:
 
 stdenv.mkDerivation rec {
-  pname = "ghidra-wasm-plugin";
-  version = "2025-01-22";
+  pname = "ghidra-gameboy-plugin";
+  version = "2024-09-29";
 
   src = fetchFromGitHub {
-    owner = "nneonneo";
-    repo = pname;
-    rev = "93532ad5d3033b62236e453be437b7435a0a6d8b";
-    sha256 = "sha256-JFUPhh4WUcfxYow3kLMyva1Ni/cQBIit983o/KbbKps=";
+    owner = "Gekkio";
+    repo = "GhidraBoy";
+    rev = "9100c3a2b711e0e6f708e2fea1e8ba32da557e13";
+    sha256 = "sha256-1VHoG+iEcq7DswNS8n3z5rxxZdlgKcKzMYxo4o4g+DY=";
   };
 
   nativeBuildInputs = [
     jdk
     gradle
+    kotlin
   ];
 
   buildPhase = ''
@@ -30,9 +31,6 @@ stdenv.mkDerivation rec {
     mv * ${pname} || true
     cd ${pname}
 
-    # Compile sleigh definitions so Ghidra doesn't crash on runtime
-    ${sleigh}/bin/sleigh -a data/languages
-
     GHIDRA_INSTALL_DIR=${ghidra}/lib/ghidra gradle buildExtension --no-daemon
   '';
 
@@ -40,13 +38,12 @@ stdenv.mkDerivation rec {
     runHook preInstall
     mkdir -p $out/share
     cp dist/*.zip $out/share
-
     runHook postInstall
   '';
 
   meta = with lib; {
-    description = "Module to load WebAssembly files into Ghidra";
-    homepage = "https://github.com/nneonneo/ghidra-wasm-plugin";
+    description = "Gameboy plugin for Ghidra";
+    homepage = "https://github.com/Gekkio/GhidraBoy";
     license = licenses.gpl3;
     platforms = platforms.linux;
   };

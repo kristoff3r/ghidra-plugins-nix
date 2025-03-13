@@ -1,4 +1,9 @@
-{ buildPythonPackage, fetchPypi, substituteAll, pip }:
+{
+  buildPythonPackage,
+  fetchPypi,
+  substituteAll,
+  pip,
+}:
 
 buildPythonPackage rec {
   pname = "jfx_bridge";
@@ -15,7 +20,7 @@ buildPythonPackage rec {
   doCheck = false;
 
   patches = [
-      (substituteAll {
+    (substituteAll {
       src = ./patches/jfx-bridge-setuptools.patch;
       inherit version;
     })
